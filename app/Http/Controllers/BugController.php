@@ -14,11 +14,16 @@ class BugController extends Controller
      */
     public function index()
     {
-        // Only QA can access for now
-        if (Auth::user()->role !== 'QA') {
+        // QA sees only their created bugs; Admin sees all
+        $user = Auth::user();
+        if (!in_array($user->role, ['QA','Admin'])) {
             abort(403);
         }
-        $bugs = Bug::with('assignedTo')->where('created_by', Auth::id())->get();
+        if ($user->role === 'Admin') {
+            $bugs = Bug::with('assignedTo')->latest()->get();
+        } else {
+            $bugs = Bug::with('assignedTo')->where('created_by', $user->id)->latest()->get();
+        }
         return view('bugs.index', compact('bugs'));
     }
     // Add relationship for assignedTo in Bug model
@@ -28,8 +33,8 @@ class BugController extends Controller
      */
     public function create()
     {
-        // Only QA can access
-        if (Auth::user()->role !== 'QA') {
+        // QA or Admin can access create form
+        if (!in_array(Auth::user()->role, ['QA','Admin'])) {
             abort(403);
         }
         $devs = User::where('role', 'Dev')->get();
@@ -41,8 +46,8 @@ class BugController extends Controller
      */
     public function store(Request $request)
     {
-        // Only QA can create
-        if (Auth::user()->role !== 'QA') {
+        // QA or Admin can create
+        if (!in_array(Auth::user()->role, ['QA','Admin'])) {
             abort(403);
         }
         $request->validate([
@@ -68,7 +73,10 @@ class BugController extends Controller
 
         // TODO: Notify assigned Dev (email/notification)
 
-        return redirect()->route('bugs.index')->with('success', 'Bug created and assigned to developer.');
+        // Redirect based on role for better UX
+        return Auth::user()->role === 'Admin'
+            ? redirect()->route('admin.dashboard')->with('success', 'Bug created and assigned to developer.')
+            : redirect()->route('bugs.index')->with('success', 'Bug created and assigned to developer.');
     }
 
     /**
@@ -85,17 +93,18 @@ class BugController extends Controller
     public function edit(Bug $bug)
     {
         $user = Auth::user();
-        // Only assigned Dev or QA can edit
+        // Only assigned Dev, QA creator, or Admin can edit
         if ($user->role === 'Dev') {
             if ($bug->assigned_to !== $user->id) abort(403);
         } elseif ($user->role === 'QA') {
-            // Allow QA to edit file if they created the bug
             if ($bug->created_by !== $user->id) abort(403);
+        } elseif ($user->role === 'Admin') {
+            // Admin can edit any bug
         } else {
             abort(403);
         }
-        // For QA, allow edit file if ?editfile=1
-        return view('bugs.edit', compact('bug'));
+        $devs = User::where('role', 'Dev')->get();
+        return view('bugs.edit', compact('bug', 'devs'));
     }
 
     /**
@@ -108,7 +117,7 @@ class BugController extends Controller
             // Only assigned Dev can update status
             if ($bug->assigned_to !== $user->id) abort(403);
             $request->validate([
-                'status' => 'required|in:inprogress,review',
+                'status' => 'required|in:inprogress,review,done',
             ]);
             $bug->status = $request->status;
             $bug->save();
@@ -125,6 +134,14 @@ class BugController extends Controller
                 $bug->save();
             }
             return redirect()->route('bugs.index')->with('success', 'File updated.');
+        } elseif ($user->role === 'Admin') {
+            // Admin can change assigned developer
+            $request->validate([
+                'assigned_to' => 'required|exists:users,id',
+            ]);
+            $bug->assigned_to = $request->assigned_to;
+            $bug->save();
+            return redirect()->route('admin.dashboard')->with('success', 'Assigned developer updated.');
         } else {
             abort(403);
         }
@@ -135,6 +152,15 @@ class BugController extends Controller
      */
     public function destroy(Bug $bug)
     {
-        //
+        $user = Auth::user();
+        // Only QA who created the bug or Admin can delete
+        if (!($user->role === 'QA' && $bug->created_by === $user->id) && $user->role !== 'Admin') {
+            abort(403);
+        }
+        $bug->delete();
+        if ($user->role === 'Admin') {
+            return redirect()->route('admin.dashboard')->with('success', 'Bug deleted successfully.');
+        }
+        return redirect()->route('bugs.index')->with('success', 'Bug deleted successfully.');
     }
 }

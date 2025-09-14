@@ -9,7 +9,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->boolean('can_access_qas')->default(false);
+            if (!Schema::hasColumn('users', 'can_access_qas')) {
+                $table->boolean('can_access_qas')->default(false);
+            }
         });
     }
 

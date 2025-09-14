@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container" style="background: url('{{ asset('10780356_19199649.jpg') }}') no-repeat center center fixed; background-size: cover; min-height: 100vh;">
+<div class="container" style='margin-top: 90px; max-width: 1200px; min-width: 320px; width: 100%; background-image: url("{{ asset('10780356_19199649.jpg') }}"); background-repeat: no-repeat; background-position: center center; background-attachment: fixed; background-size: cover; min-height: 100vh; color: #fff;'>
     <div class="text-center mb-4">
         <h2 class="font-bold text-2xl">Developer Dashboard</h2>
     </div>

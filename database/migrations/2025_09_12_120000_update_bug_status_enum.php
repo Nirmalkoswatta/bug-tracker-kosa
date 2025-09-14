@@ -13,8 +13,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('bugs', function (Blueprint $table) {
-            // Change ENUM to include 'inprogress' and 'review' and increase VARCHAR length if needed
-            DB::statement("ALTER TABLE bugs MODIFY status ENUM('open', 'inprogress', 'review', 'in_progress', 'completed', 'reassigned') DEFAULT 'open'");
+            // Change ENUM to include 'inprogress', 'review', and 'done'
+            DB::statement("ALTER TABLE bugs MODIFY status ENUM('open', 'inprogress', 'review', 'done', 'in_progress', 'completed', 'reassigned') DEFAULT 'open'");
         });
     }
 
@@ -24,7 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('bugs', function (Blueprint $table) {
-            DB::statement("ALTER TABLE bugs MODIFY status ENUM('open', 'in_progress', 'review', 'completed', 'reassigned') DEFAULT 'open'");
+            DB::statement("ALTER TABLE bugs MODIFY status ENUM('open', 'in_progress', 'review', 'done', 'completed', 'reassigned') DEFAULT 'open'");
         });
     }
 };

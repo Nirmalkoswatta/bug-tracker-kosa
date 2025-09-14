@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
 
         // Default Admin User
         \App\Models\User::updateOrCreate(
-            [ 'email' => 'admin@gmail.com' ],
+            ['email' => 'admin@gmail.com'],
             [
                 'name' => 'Admin',
                 'email' => 'admin@gmail.com',
