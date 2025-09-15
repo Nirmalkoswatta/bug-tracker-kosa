@@ -89,6 +89,7 @@
                         <tr>
                             <th>Name</th>
                             <th class="d-none d-md-table-cell">Email</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -96,10 +97,17 @@
                         <tr>
                             <td>{{ $qa->name }}</td>
                             <td class="d-none d-md-table-cell small">{{ $qa->email }}</td>
+                            <td>
+                                <form method="POST" action="{{ route('admin.deleteUser', $qa->id) }}" onsubmit="return confirm('Delete QA {{ $qa->name }}?');" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="2" class="text-center small">No QAs registered.</td>
+                            <td colspan="3" class="text-center small">No QAs registered.</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -116,6 +124,7 @@
                         <tr>
                             <th>Name</th>
                             <th class="d-none d-md-table-cell">Email</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -123,10 +132,17 @@
                         <tr>
                             <td>{{ $pm->name }}</td>
                             <td class="d-none d-md-table-cell small">{{ $pm->email }}</td>
+                            <td>
+                                <form method="POST" action="{{ route('admin.deleteUser', $pm->id) }}" onsubmit="return confirm('Delete Project Manager {{ $pm->name }}?');" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="2" class="text-center small">No project managers registered.</td>
+                            <td colspan="3" class="text-center small">No project managers registered.</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -489,12 +505,22 @@
     }
 
     /* Title/subtitle overrides */
-    .page-title { color:#ffffff !important; }
-    .subtitle { color:rgba(255,255,255,0.75) !important; }
-    .kpi-label { color:rgba(255,255,255,0.8) !important; }
+    .page-title {
+        color: #ffffff !important;
+    }
+
+    .subtitle {
+        color: rgba(255, 255, 255, 0.75) !important;
+    }
+
+    .kpi-label {
+        color: rgba(255, 255, 255, 0.8) !important;
+    }
 
     /* Ensure KPI tile background adapts on dark gradient parent */
-    .kpi-tile { backdrop-filter:blur(4px); }
+    .kpi-tile {
+        backdrop-filter: blur(4px);
+    }
 </style>
 @endpush
 

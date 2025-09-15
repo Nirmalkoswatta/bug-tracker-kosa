@@ -1,168 +1,155 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid px-3 px-md-4">
-    <style>
-        .edit-bug-wrapper {
-            min-height: calc(100vh - 120px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+<style>
+    .modern-bug-edit-bg {
+        min-height: 100vh;
+        width: 100vw;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        /* The background remains starry/animated as set in the layout */
+    }
+
+    .modern-bug-edit-card {
+        background: rgba(255, 255, 255, 0.13);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border-radius: 24px;
+        border: 1.5px solid rgba(255, 255, 255, 0.18);
+        max-width: 500px;
+        width: 100%;
+        padding: 2.5rem 2rem 2rem 2rem;
+        margin: 2.5rem 0;
+        position: relative;
+        color: #fff;
+    }
+
+    .modern-bug-edit-title {
+        font-size: 2rem;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        letter-spacing: 1px;
+        color: #fff;
+        text-shadow: 0 2px 12px #0006;
+    }
+
+    .modern-bug-edit-label {
+        font-weight: 500;
+        margin-bottom: 0.4rem;
+        color: #e0e0e0;
+        letter-spacing: 0.5px;
+    }
+
+    .modern-bug-edit-input,
+    .modern-bug-edit-select,
+    .modern-bug-edit-textarea {
+        background: #181818;
+        border: 1.5px solid rgba(255, 255, 255, 0.22);
+        border-radius: 12px;
+        color: #fff;
+        padding: 0.7rem 1rem;
+        margin-bottom: 1.2rem;
+        width: 100%;
+        font-size: 1.08rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        box-shadow: 0 1px 6px #0002;
+    }
+
+    .modern-bug-edit-select option {
+        background: #181818;
+        color: #fff;
+    }
+
+    .modern-bug-edit-input:focus,
+    .modern-bug-edit-select:focus,
+    .modern-bug-edit-textarea:focus {
+        border-color: #339cff;
+        outline: none;
+        box-shadow: 0 0 0 2px #339cff44;
+        background: rgba(255, 255, 255, 0.22);
+    }
+
+    .modern-bug-edit-btns {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.7rem;
+        margin-top: 1.5rem;
+    }
+
+    .modern-bug-edit-btn-cancel {
+        border-radius: 16px;
+        border: 1.5px solid #339cff;
+        background: transparent;
+        color: #339cff;
+        font-weight: 500;
+        padding: 0.55rem 1.5rem;
+        transition: background 0.2s, color 0.2s;
+    }
+
+    .modern-bug-edit-btn-cancel:hover {
+        background: #339cff22;
+        color: #fff;
+    }
+
+    .modern-bug-edit-btn-update {
+        border-radius: 16px;
+        background: #339cff;
+        color: #fff;
+        font-weight: 600;
+        border: none;
+        padding: 0.55rem 1.5rem;
+        box-shadow: 0 2px 8px #339cff33;
+        transition: background 0.2s;
+    }
+
+    .modern-bug-edit-btn-update:hover {
+        background: #2176c7;
+    }
+
+    @media (max-width: 600px) {
+        .modern-bug-edit-card {
+            padding: 1.2rem 0.5rem 1.2rem 0.5rem;
+            border-radius: 16px;
         }
 
-        .edit-bug-panel {
-            width: 100%;
-            max-width: 760px;
-            background: rgba(255, 255, 255, 0.10);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.22);
-            border-radius: 24px;
-            padding: 2.2rem 2.1rem 2rem;
-            box-shadow: 0 10px 28px -6px rgba(0, 0, 0, 0.55);
-            position: relative;
+        .modern-bug-edit-title {
+            font-size: 1.3rem;
         }
-
-        .edit-bug-panel h2 {
-            font-weight: 600;
-            letter-spacing: .5px;
-            color: #fff !important;
-        }
-
-        .edit-bug-panel label.form-label {
-            color: #fff !important;
-            font-weight: 500;
-        }
-
-        .edit-bug-panel small.helper-text {
-            color: #cfd8dc;
-            font-size: .72rem;
-            letter-spacing: .5px;
-            text-transform: uppercase;
-            display: block;
-            margin-top: -.25rem;
-            margin-bottom: .75rem;
-        }
-
-        .edit-divider {
-            height: 1px;
-            background: linear-gradient(90deg, transparent, #ffffff55, transparent);
-            margin: .9rem 0 1.35rem;
-        }
-
-        .file-preview-box img {
-            border: 1px solid rgba(255, 255, 255, 0.35);
-        }
-
-        @media (max-width: 575.98px) {
-            .edit-bug-panel {
-                padding: 1.65rem 1.2rem 1.2rem;
-                border-radius: 18px;
-            }
-        }
-    </style>
-    <div class="edit-bug-wrapper py-4 py-md-5">
-        <div class="edit-bug-panel">
-            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
-                <h2 class="mb-0">Edit Bug</h2>
-                @if((Auth::user()->role === 'QA' && $bug->created_by === Auth::id()) || Auth::user()->role === 'Admin')
-                <form method="POST" action="{{ route('bugs.destroy', $bug) }}" onsubmit="return confirm('Are you sure you want to delete this bug?');">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-outline-danger" style="border-radius:18px;">Delete</button>
-                </form>
-                @endif
+    }
+</style>
+<div class="modern-bug-edit-bg">
+    <div class="modern-bug-edit-card">
+        <div class="modern-bug-edit-title">Bug Tracker</div>
+        <form method="POST" action="{{ route('bugs.update', $bug) }}">
+            @csrf
+            @method('PUT')
+            <label for="title" class="modern-bug-edit-label">Title</label>
+            <input type="text" class="modern-bug-edit-input" id="title" name="title" value="{{ $bug->title }}" @if(Auth::user()->role!=='QA' && Auth::user()->role!=='Admin') readonly @endif>
+            <label for="description" class="modern-bug-edit-label">Description</label>
+            <textarea class="modern-bug-edit-textarea" id="description" name="description" rows="4" @if(Auth::user()->role!=='QA' && Auth::user()->role!=='Admin') readonly @endif>{{ $bug->description }}</textarea>
+            @if(Auth::user()->role === 'Admin')
+            <label for="assigned_to" class="modern-bug-edit-label">Assigned Developer</label>
+            <select class="modern-bug-edit-select" id="assigned_to" name="assigned_to">
+                @foreach($devs as $dev)
+                <option value="{{ $dev->id }}" @if($bug->assigned_to == $dev->id) selected @endif>{{ $dev->name }} ({{ $dev->email }})</option>
+                @endforeach
+            </select>
+            @endif
+            <label for="status" class="modern-bug-edit-label">Status</label>
+            <select class="modern-bug-edit-select" id="status" name="status">
+                <option value="inprogress" {{ $bug->status == 'inprogress' ? 'selected' : '' }}>In Progress</option>
+                <option value="review" {{ $bug->status == 'review' ? 'selected' : '' }}>Review</option>
+                <option value="done" {{ $bug->status == 'done' ? 'selected' : '' }}>Done</option>
+            </select>
+            <div class="modern-bug-edit-btns">
+                <a href="{{ url()->previous() }}" class="modern-bug-edit-btn-cancel">Cancel</a>
+                <button type="submit" class="modern-bug-edit-btn-update">Update</button>
             </div>
-            <div class="edit-divider"></div>
-            <form method="POST" action="{{ route('bugs.update', $bug) }}" enctype="multipart/form-data" class="mb-0">
-                @csrf
-                @method('PUT')
-                <div class="mb-3">
-                    <label for="title" class="form-label">Title</label>
-                    <input type="text" class="form-control" id="title" name="title" value="{{ $bug->title }}" @if(Auth::user()->role!=='QA' && Auth::user()->role!=='Admin') readonly @endif>
-                </div>
-                <div class="mb-3">
-                    <label for="description" class="form-label">Description</label>
-                    <textarea class="form-control" id="description" name="description" @if(Auth::user()->role!=='QA' && Auth::user()->role!=='Admin') readonly @endif>{{ $bug->description }}</textarea>
-                </div>
-                @if(Auth::user()->role === 'Admin')
-                <div class="mb-3">
-                    <label for="assigned_to" class="form-label">Assigned Developer</label>
-                    <select class="form-control" id="assigned_to" name="assigned_to">
-                        @foreach($devs as $dev)
-                        <option value="{{ $dev->id }}" @if($bug->assigned_to == $dev->id) selected @endif>{{ $dev->name }} ({{ $dev->email }})</option>
-                        @endforeach
-                    </select>
-                </div>
-                @endif
-                <div class="mb-3">
-                    <label for="status" class="form-label">Status</label>
-                    <select class="form-control" id="status" name="status">
-                        <option value="inprogress" {{ $bug->status == 'inprogress' ? 'selected' : '' }}>In Progress</option>
-                        <option value="review" {{ $bug->status == 'review' ? 'selected' : '' }}>Review</option>
-                        <option value="done" {{ $bug->status == 'done' ? 'selected' : '' }}>Done</option>
-                    </select>
-                </div>
-                @if($bug->attachment)
-                @php
-                $ext = strtolower(pathinfo($bug->attachment, PATHINFO_EXTENSION));
-                $imgExts = ['jpg','jpeg','png','gif','bmp','webp'];
-                @endphp
-                @if(Auth::user()->role === 'Dev' && $bug->assigned_to === Auth::id())
-                <div class="mb-3" id="file-preview-box">
-                    <label class="form-label">QA Uploaded File:</label>
-                    <button type="button" class="btn-close float-end" aria-label="Close" onclick="document.getElementById('file-preview-box').style.display='none';"></button>
-                    @if(in_array($ext, $imgExts))
-                    <div class="mb-2">
-                        <img src="{{ asset('storage/' . $bug->attachment) }}" alt="QA Uploaded Image" style="max-width: 300px; max-height: 200px; border-radius: 8px; box-shadow: 0 2px 8px #0002;">
-                    </div>
-                    @else
-                    <a href="{{ asset('storage/' . $bug->attachment) }}" target="_blank" class="btn btn-info btn-sm">View Document</a>
-                    @endif
-                    <a href="{{ route('bugs.download', $bug) }}" class="btn btn-success btn-sm">Download File</a>
-                </div>
-                @endif
-                @if(Auth::user()->role === 'QA' && $bug->created_by === Auth::id())
-                <div class="mb-3" id="file-preview-box-qa">
-                    <label class="form-label">QA Uploaded File:</label>
-                    <button type="button" class="btn-close float-end" aria-label="Close" onclick="document.getElementById('file-preview-box-qa').style.display='none';"></button>
-                    @if(in_array($ext, $imgExts))
-                    <div class="mb-2">
-                        <img src="{{ asset('storage/' . $bug->attachment) }}" alt="QA Uploaded Image" style="max-width: 300px; max-height: 200px; border-radius: 8px; box-shadow: 0 2px 8px #0002;">
-                    </div>
-                    <a href="{{ asset('storage/' . $bug->attachment) }}" target="_blank" class="btn btn-info btn-sm">View Full Image</a>
-                    @else
-                    <a href="{{ asset('storage/' . $bug->attachment) }}" target="_blank" class="btn btn-info btn-sm">View Document</a>
-                    @endif
-                    <a href="{{ route('bugs.download', $bug) }}" class="btn btn-success btn-sm">Download File</a>
-                    <a href="{{ route('bugs.edit', $bug) }}?editfile=1" class="btn btn-secondary btn-sm">Edit/Update File</a>
-                </div>
-                @endif
-                @if(Auth::user()->role === 'Admin' && $bug->attachment)
-                @php
-                $ext = strtolower(pathinfo($bug->attachment, PATHINFO_EXTENSION));
-                $imgExts = ['jpg','jpeg','png','gif','bmp','webp'];
-                @endphp
-                <div class="mb-3" id="file-preview-box-admin">
-                    <label class="form-label">Attachment:</label>
-                    @if(in_array($ext, $imgExts))
-                    <div class="mb-2">
-                        <img src="{{ asset('storage/' . $bug->attachment) }}" alt="Attachment Image" style="max-width: 300px; max-height: 200px; border-radius: 8px; box-shadow: 0 2px 8px #0002;">
-                    </div>
-                    <a href="{{ asset('storage/' . $bug->attachment) }}" target="_blank" class="btn btn-info btn-sm">View Full Image</a>
-                    @else
-                    <a href="{{ asset('storage/' . $bug->attachment) }}" target="_blank" class="btn btn-info btn-sm">View Document</a>
-                    @endif
-                    <a href="{{ route('bugs.download', $bug) }}" class="btn btn-success btn-sm">Download File</a>
-                </div>
-                @endif
-                @endif
-                <div class="d-flex justify-content-end gap-2 mt-4">
-                    <a href="{{ url()->previous() }}" class="btn btn-outline-light" style="--bs-btn-color:#fff; --bs-btn-border-color:#ffffff55; --bs-btn-hover-bg:#ffffff22; border-radius:18px;">Cancel</a>
-                    <button type="submit" class="btn btn-primary px-4" style="border-radius:18px;">Update</button>
-                </div>
-            </form>
-        </div>
+        </form>
     </div>
 </div>
+// ...existing code...
 @endsection

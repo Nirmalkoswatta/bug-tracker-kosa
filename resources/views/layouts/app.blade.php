@@ -141,10 +141,10 @@
     @stack('styles')
 </head>
 
-<body>
+<body style="background: #000 !important; min-height: 100vh;">
     <div id="starfield" aria-hidden="true"></div>
     <div id="app" class="app-gradient-overlay relative" style="z-index:1;">
-        <nav class="navbar navbar-expand-md navbar-light fixed-top" style="background: rgba(255,255,255,0.10); backdrop-filter: blur(8px); z-index: 1040;">
+        <nav class="navbar navbar-expand-md navbar-light fixed-top" style="background: transparent !important; backdrop-filter: blur(8px); z-index: 1040;">
             <div class="container">
                 <a class="navbar-brand" href="{{ url('/') }}">
                     Bug Tracker

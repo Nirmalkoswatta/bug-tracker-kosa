@@ -16,7 +16,7 @@ class BugController extends Controller
     {
         // QA sees only their created bugs; Admin sees all
         $user = Auth::user();
-        if (!in_array($user->role, ['QA','Admin'])) {
+        if (!in_array($user->role, ['QA', 'Admin'])) {
             abort(403);
         }
         if ($user->role === 'Admin') {
@@ -34,7 +34,7 @@ class BugController extends Controller
     public function create()
     {
         // QA or Admin can access create form
-        if (!in_array(Auth::user()->role, ['QA','Admin'])) {
+        if (!in_array(Auth::user()->role, ['QA', 'Admin'])) {
             abort(403);
         }
         $devs = User::where('role', 'Dev')->get();
@@ -47,7 +47,7 @@ class BugController extends Controller
     public function store(Request $request)
     {
         // QA or Admin can create
-        if (!in_array(Auth::user()->role, ['QA','Admin'])) {
+        if (!in_array(Auth::user()->role, ['QA', 'Admin'])) {
             abort(403);
         }
         $request->validate([
@@ -84,7 +84,8 @@ class BugController extends Controller
      */
     public function show(Bug $bug)
     {
-        //
+        // Show the bug details page
+        return view('bugs.show', compact('bug'));
     }
 
     /**
@@ -123,17 +124,23 @@ class BugController extends Controller
             $bug->save();
             return redirect()->route('dev.dashboard')->with('success', 'Bug status updated.');
         } elseif ($user->role === 'QA') {
-            // Only QA who created can update file
+            // Only QA who created can update their own bug
             if ($bug->created_by !== $user->id) abort(403);
+            $validated = $request->validate([
+                'title' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'status' => 'required|in:inprogress,review,done',
+                'attachment' => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048',
+            ]);
+            $bug->title = $validated['title'];
+            $bug->description = $validated['description'] ?? '';
+            $bug->status = $validated['status'];
             if ($request->hasFile('attachment')) {
-                $request->validate([
-                    'attachment' => 'file|mimes:png,jpg,jpeg,pdf|max:2048',
-                ]);
                 $path = $request->file('attachment')->store('attachments', 'public');
                 $bug->attachment = $path;
-                $bug->save();
             }
-            return redirect()->route('bugs.index')->with('success', 'File updated.');
+            $bug->save();
+            return redirect()->route('bugs.index')->with('success', 'Bug updated.');
         } elseif ($user->role === 'Admin') {
             // Admin can change assigned developer
             $request->validate([
