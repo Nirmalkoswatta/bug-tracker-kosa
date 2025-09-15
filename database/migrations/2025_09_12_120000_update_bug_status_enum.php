@@ -1,3 +1,9 @@
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=bugtracker
+DB_USERNAME=root
+DB_PASSWORD=root
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -12,10 +18,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('bugs', function (Blueprint $table) {
-            // Change ENUM to include 'inprogress', 'review', and 'done'
-            DB::statement("ALTER TABLE bugs MODIFY status ENUM('open', 'inprogress', 'review', 'done', 'in_progress', 'completed', 'reassigned') DEFAULT 'open'");
-        });
+        // SQLite does not support MODIFY or ENUM. We'll change the column to TEXT for compatibility.
+        if (Schema::getConnection()->getDriverName() === 'sqlite') {
+            Schema::table('bugs', function (Blueprint $table) {
+                $table->text('status')->default('open')->change();
+            });
+        } else {
+            Schema::table('bugs', function (Blueprint $table) {
+                DB::statement("ALTER TABLE bugs MODIFY status ENUM('open', 'inprogress', 'review', 'done', 'in_progress', 'completed', 'reassigned') DEFAULT 'open'");
+            });
+        }
     }
 
     /**
@@ -23,8 +35,14 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('bugs', function (Blueprint $table) {
-            DB::statement("ALTER TABLE bugs MODIFY status ENUM('open', 'in_progress', 'review', 'done', 'completed', 'reassigned') DEFAULT 'open'");
-        });
+        if (Schema::getConnection()->getDriverName() === 'sqlite') {
+            Schema::table('bugs', function (Blueprint $table) {
+                $table->text('status')->default('open')->change();
+            });
+        } else {
+            Schema::table('bugs', function (Blueprint $table) {
+                DB::statement("ALTER TABLE bugs MODIFY status ENUM('open', 'in_progress', 'review', 'done', 'completed', 'reassigned') DEFAULT 'open'");
+            });
+        }
     }
 };
