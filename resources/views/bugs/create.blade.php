@@ -26,11 +26,12 @@
 
     .bug-create-panel h2,
     .bug-create-panel .form-label {
-        color: #fff !important;
+        color: #111 !important;
     }
 
     .bug-create-panel .form-control {
-        color: #212529;
+        color: #111;
+        background: #fff;
     }
 
     .bug-create-panel .alert {
@@ -72,13 +73,34 @@
                 <input type="file" class="form-control" id="attachment" name="attachment" accept=".png,.jpg,.jpeg,.pdf">
             </div>
             <div class="mb-4">
-                <label for="assigned_to" class="form-label">Assign to Developer</label>
-                <select class="form-control" id="assigned_to" name="assigned_to">
+                <label for="assigned_to" class="form-label">Assign to Developer @if(Auth::user()->role!=='Admin')<span class="text-danger">*</span>@endif</label>
+                <select class="form-control" id="assigned_to" name="assigned_to" @if(Auth::user()->role!=='Admin') required @endif>
+                    <option value="">-- Select Developer --</option>
                     @foreach($devs as $dev)
                     <option value="{{ $dev->id }}">{{ $dev->name }} ({{ $dev->email }})</option>
                     @endforeach
                 </select>
             </div>
+            @if(Auth::user()->role==='Admin')
+            <div class="mb-4">
+                <label for="qa_reviewer" class="form-label">Assign QA Reviewer (optional)</label>
+                <select class="form-control" id="qa_reviewer" name="qa_reviewer">
+                    <option value="">-- Select QA --</option>
+                    @foreach(($qas ?? collect()) as $qa)
+                    <option value="{{ $qa->id }}">{{ $qa->name }} ({{ $qa->email }})</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="pm_id" class="form-label">Assign Project Manager (optional)</label>
+                <select class="form-control" id="pm_id" name="pm_id">
+                    <option value="">-- Select PM --</option>
+                    @foreach(($pms ?? collect()) as $pm)
+                    <option value="{{ $pm->id }}">{{ $pm->name }} ({{ $pm->email }})</option>
+                    @endforeach
+                </select>
+            </div>
+            @endif
             <div class="d-flex justify-content-end gap-2">
                 <a href="{{ url()->previous() }}" class="btn btn-outline-light" style="--bs-btn-color:#fff; --bs-btn-border-color:#ffffff55; --bs-btn-hover-bg:#ffffff22;">Cancel</a>
                 <button type="submit" class="btn btn-primary px-4">Create Bug</button>

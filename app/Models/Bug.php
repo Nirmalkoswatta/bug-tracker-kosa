@@ -14,6 +14,7 @@ class Bug extends Model
         'assigned_to',
         'status',
         'reviewed_by',
+        'pm_id',
     ];
     public function assignedTo()
     {
@@ -22,5 +23,9 @@ class Bug extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+    public function pm()
+    {
+        return $this->belongsTo(User::class, 'pm_id');
     }
 }

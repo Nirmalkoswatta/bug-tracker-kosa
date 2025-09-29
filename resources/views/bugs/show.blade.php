@@ -12,14 +12,14 @@
     }
 
     .bug-details-card {
-        background: rgba(30, 30, 40, 0.97);
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        background: rgba(255, 255, 255, 0.97);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.13);
         border-radius: 24px;
-        border: 1.5px solid rgba(255, 255, 255, 0.13);
+        border: 1.5px solid #e5e7eb;
         max-width: 600px;
         width: 100%;
         padding: 2.5rem 2rem 2rem 2rem;
-        color: #fff;
+        color: #111;
         margin: 2.5rem 0;
         position: relative;
     }
@@ -30,19 +30,19 @@
         text-align: center;
         margin-bottom: 1.5rem;
         letter-spacing: 1px;
-        color: #fff;
-        text-shadow: 0 2px 12px #0006;
+        color: #111;
+        text-shadow: none;
     }
 
     .bug-details-label {
         font-weight: 500;
-        color: #b3e5fc;
+        color: #222;
         margin-bottom: 0.2rem;
         letter-spacing: 0.5px;
     }
 
     .bug-details-value {
-        color: #fff;
+        color: #111;
         margin-bottom: 1.1rem;
         font-size: 1.08rem;
         word-break: break-word;
@@ -54,8 +54,8 @@
         font-weight: 600;
         padding: 0.3em 1em;
         border-radius: 1em;
-        background: #222;
-        color: #fff;
+        background: #f3f4f6;
+        color: #111;
         margin-bottom: 0.7rem;
         letter-spacing: 0.5px;
     }

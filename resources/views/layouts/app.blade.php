@@ -2,124 +2,175 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
-    .dropdown-item.logout-red {
-    color: #dc3545 !important;
-    font-weight: 600;
-    background: transparent !important;
-    }
-    .dropdown-menu {
-    background: #fff !important;
-    }
-    .dropdown-item.logout-red:hover, .dropdown-item.logout-red:focus {
-    background: #ffeaea !important;
-    color: #a71d2a !important;
-    }
     <style>
+        :root {
+            --nav-h: 88px;
+        }
+
+        /* Dropdown styles */
+        .dropdown-item.logout-red {
+            color: #dc3545 !important;
+            font-weight: 600;
+            background: transparent !important;
+        }
+
+        .dropdown-menu {
+            background: #fff !important;
+        }
+
+        .dropdown-item.logout-red:hover,
+        .dropdown-item.logout-red:focus {
+            background: #ffeaea !important;
+            color: #a71d2a !important;
+        }
+
+        /* Global white theme */
+        html,
+        body {
+            background: #ffffff !important;
+            color: #111111 !important;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Navbar in white theme */
+        .navbar {
+            background: #ffffff !important;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
         .navbar,
         .navbar * {
-            color: #fff !important;
-            font-size: 1.15rem;
+            color: #111111 !important;
+            font-size: 1.05rem;
+        }
+
+        /* Card system (global) */
+        .ui-container {
+            max-width: 100%;
+            margin: 0;
+            /* left aligned */
+            padding: 24px 16px 40px;
+        }
+
+        /* Ensure main content always clears fixed navbar even before JS executes */
+        main[data-fixed-nav] {
+            padding-top: calc(var(--nav-h, 88px) + 16px);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            align-items: stretch;
+            justify-items: stretch;
+        }
+
+        .ui-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            box-shadow: 0 10px 24px -10px rgba(0, 0, 0, .18);
+            transition: transform .22s ease, box-shadow .22s ease, opacity .35s ease, translate .35s ease;
+            padding: 14px;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .ui-card.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .ui-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 34px -14px rgba(0, 0, 0, .22);
+        }
+
+        /* Ensure first heading below navbar is never hidden */
+        .page-head,
+        .ui-container>h1:first-child,
+        .ui-container>h2:first-child,
+        .ui-container>h3:first-child {
+            margin-top: max(0px, calc(var(--nav-h, 88px) - 60px));
+        }
+
+        .btn {
+            position: relative;
+            z-index: 0;
         }
 
         .navbar .navbar-brand {
-            font-size: 1.5rem;
-            font-weight: bold;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #111111 !important;
+        }
+
+        /* Modern brand styling */
+        .brand-modern {
+            font-size: clamp(1.7rem, 2.6vw, 2.4rem) !important;
+            font-weight: 800 !important;
+            letter-spacing: 1px;
+            line-height: 1.05;
+            background: linear-gradient(90deg, #111 0%, #2563eb 40%, #7c3aed 70%, #db2777 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent !important;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: .55rem;
+            text-transform: uppercase;
+        }
+
+        .brand-modern .brand-accent {
+            font-size: 1.15em;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+            animation: bugPulse 3.5s ease-in-out infinite;
+        }
+
+        @keyframes bugPulse {
+
+            0%,
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
+
+            25% {
+                transform: scale(1.08) rotate(4deg);
+            }
+
+            50% {
+                transform: scale(1.02) rotate(-3deg);
+            }
+
+            75% {
+                transform: scale(1.09) rotate(2deg);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .brand-modern {
+                font-size: 1.9rem !important;
+            }
         }
 
         .navbar .nav-link,
         .navbar .dropdown-toggle {
-            font-size: 1.15rem;
+            font-size: 1.05rem;
+            color: #111111 !important;
         }
 
         .btn-login,
         .btn-register,
         .btn-success {
-            font-size: 1.15rem !important;
+            font-size: 1.05rem !important;
         }
 
-        body {
-            /* Unified admin dashboard gradient globally */
-            background: linear-gradient(135deg, #0f2027 0%, #2c5364 55%, #141414 100%);
-            min-height: 100vh;
-            overflow-x: hidden;
-            color: #fff;
-        }
-
-        /* Optional utility for subtle radial accent (not animated) */
+        /* Remove previous gradient overlay visuals */
         .app-gradient-overlay:before,
         .app-gradient-overlay:after {
-            content: "";
-            position: fixed;
-            width: 520px;
-            height: 520px;
-            border-radius: 50%;
-            filter: blur(140px);
-            opacity: 0.25;
-            pointer-events: none;
-            mix-blend-mode: screen;
-        }
-
-        .app-gradient-overlay:before {
-            top: -160px;
-            left: -120px;
-            background: linear-gradient(90deg, #6366f1, #8b5cf6);
-        }
-
-        .app-gradient-overlay:after {
-            bottom: -180px;
-            right: -140px;
-            background: linear-gradient(90deg, #ec4899, #f59e0b);
-        }
-
-        /* Starfall animation (reintroduced) */
-        #starfield {
-            position: fixed;
-            inset: 0;
-            overflow: hidden;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .star {
-            position: absolute;
-            top: -10vh;
-            width: 2px;
-            height: 2px;
-            background: #fff;
-            border-radius: 50%;
-            opacity: .85;
-            animation: fall linear infinite;
-        }
-
-        @keyframes fall {
-            0% {
-                transform: translateY(-10vh);
-                opacity: .9;
-            }
-
-            90% {
-                opacity: .85;
-            }
-
-            100% {
-                transform: translateY(110vh);
-                opacity: 0;
-            }
-        }
-
-        /* Occasionally create longer streaks */
-        .star.streak {
-            width: 2px;
-            height: 110px;
-            background: linear-gradient(#fff, rgba(255, 255, 255, 0));
-            filter: drop-shadow(0 0 4px rgba(255, 255, 255, .6));
-        }
-
-        /* Respect reduced-motion preference */
-        @media (prefers-reduced-motion: reduce) {
-            .star {
-                animation-duration: 12s !important;
-            }
+            display: none !important;
         }
     </style>
     <meta charset="utf-8">
@@ -141,41 +192,25 @@
     @stack('styles')
 </head>
 
-<body style="background: #000 !important; min-height: 100vh;">
-    <div id="starfield" aria-hidden="true"></div>
-    <div id="app" class="app-gradient-overlay relative" style="z-index:1;">
-        <nav class="navbar navbar-expand-md navbar-light fixed-top" style="background: transparent !important; backdrop-filter: blur(8px); z-index: 1040;">
-            <div class="container">
-                <a class="navbar-brand" href="{{ url('/') }}">
-                    Bug Tracker
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav me-auto"></ul>
-                    <ul class="navbar-nav ms-auto align-items-center">
-                        @guest
-                        @if (Route::has('login'))
-                        <li class="nav-item">
-                            <a class="btn btn-success text-white px-4 py-2 mx-1 btn-login" style="font-weight:600; border-radius: 24px;" href="{{ route('login') }}">{{ __('Login') }}</a>
-                        </li>
-                        @endif
-                        @if (Route::has('register'))
-                        <li class="nav-item">
-                            <a class="btn btn-success text-white px-4 py-2 mx-1 btn-register" style="font-weight:600; border-radius: 24px;" href="{{ route('register') }}">{{ __('Register') }}</a>
-                        </li>
-                        @endif
-                        @else
+<body style="background: #fff !important; min-height: 100vh; color:#111 !important;">
+    <div id="app" class="relative" style="z-index:1;">
+        <nav class="navbar navbar-expand-md navbar-light fixed-top" style="z-index: 1040;">
+            <div class="container d-flex justify-content-center">
+                <span class="navbar-brand brand-modern text-center" style="cursor: default; pointer-events: none; flex:0 1 auto;">
+                    <span class="brand-accent">🐞</span> Bug Tracker
+                </span>
+                <div class="collapse navbar-collapse show position-absolute end-0 me-3" style="top:0; bottom:0; display:flex; align-items:center;" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto d-none"></ul>
+                    <ul class="navbar-nav ms-auto align-items-center" style="gap:0.75rem;">
+                        @auth
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                 {{ Auth::user()->name }}
                             </a>
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item logout-red" href="{{ route('logout') }}"
-                                    style="color: #dc3545 !important; font-weight: 600; background: transparent !important;"
-                                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                <a href="{{ route('logout') }}"
+                                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                                    class="dropdown-item logout-red">
                                     {{ __('Logout') }}
                                 </a>
                                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
@@ -183,40 +218,34 @@
                                 </form>
                             </div>
                         </li>
-                        @endguest
+                        @endauth
                     </ul>
                 </div>
             </div>
         </nav>
-        <main class="py-4" style="padding-top: 80px;">
-            @yield('content')
+        <main class="py-4" data-fixed-nav>
+            <div class="ui-container">
+                @include('partials.flash')
+                @yield('content')
+            </div>
         </main>
     </div>
 
-    @stack('scripts')
     <script>
-        (function() {
-            const container = document.getElementById('starfield');
-            if (!container) return;
-            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            const STAR_COUNT = prefersReducedMotion ? 30 : 90;
-            for (let i = 0; i < STAR_COUNT; i++) {
-                const s = document.createElement('div');
-                const streak = Math.random() < 0.12; // 12% streaks
-                s.className = 'star' + (streak ? ' streak' : '');
-                const startLeft = Math.random() * 100; // vw
-                s.style.left = startLeft + 'vw';
-                if (streak) {
-                    s.style.animationDuration = (6 + Math.random() * 8) + 's';
-                } else {
-                    s.style.animationDuration = (3 + Math.random() * 6) + 's';
-                }
-                s.style.animationDelay = (Math.random() * 6) + 's';
-                s.style.opacity = (0.55 + Math.random() * 0.4).toFixed(2);
-                container.appendChild(s);
+        document.addEventListener('DOMContentLoaded', function() {
+            const nav = document.querySelector('nav.navbar');
+            if (nav) {
+                const h = Math.ceil(nav.getBoundingClientRect().height);
+                document.documentElement.style.setProperty('--nav-h', h + 'px');
             }
-        })();
+            const cards = Array.from(document.querySelectorAll('.ui-card'));
+            cards.forEach((c, i) => {
+                setTimeout(() => c.classList.add('animate-in'), 60 + i * 70);
+            });
+        });
     </script>
+    @stack('scripts')
+    <!-- Starfall animation removed -->
 </body>
 
 </html>

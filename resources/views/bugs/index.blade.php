@@ -78,15 +78,15 @@
             <div class="col-12 col-md-6 col-lg-4">
                 <div class="bug-card-glass p-4 h-100 d-flex flex-column">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="fw-bold fs-5" style="color:#fff;">{{ $bug->title }}</span>
+                        <span class="fw-bold fs-5" style="color:#111;">{{ $bug->title }}</span>
                         <span class="{{ $statusClass }}">{{ ucfirst($status) }}</span>
                     </div>
                     <div class="mb-2">
-                        <span class="bug-meta-label">ID:</span> <span style="color:#fff;">{{ $bug->id }}</span>
+                        <span class="bug-meta-label">ID:</span> <span style="color:#111;">{{ $bug->id }}</span>
                     </div>
                     <div class="mb-2">
                         <span class="bug-meta-label">QA (Creator):</span>
-                        <span style="color:#fff;">
+                        <span style="color:#111;">
                             @php
                             $creator = $bug->qa_creator ?? $bug->creator ?? null;
                             $creatorName = is_object($creator) ? ($creator->name ?? '-') : (is_array($creator) ? ($creator['name'] ?? '-') : (is_string($creator) ? $creator : '-'));
@@ -100,11 +100,11 @@
                         </span>
                     </div>
                     <div class="mb-2">
-                        <span class="bug-meta-label">Assigned Dev:</span> <span style="color:#fff;">{{ $bug->assigned_dev ?? (optional($bug->assignedTo)->name ?? '-') }}</span>
+                        <span class="bug-meta-label">Assigned Dev:</span> <span style="color:#111;">{{ $bug->assigned_dev ?? (optional($bug->assignedTo)->name ?? '-') }}</span>
                     </div>
                     <div class="mb-2">
                         <span class="bug-meta-label">Description:</span>
-                        <div class="small" style="color:#fff;">{{ Str::limit($bug->description, 80) }}</div>
+                        <div class="small" style="color:#111;">{{ Str::limit($bug->description, 80) }}</div>
                     </div>
                     <div class="mt-auto d-flex gap-2">
                         @if($bug->attachment)

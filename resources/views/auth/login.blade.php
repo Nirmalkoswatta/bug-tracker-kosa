@@ -48,7 +48,7 @@
         padding: 14px 48px 14px 44px;
         font-size: 1.08rem;
         background: rgba(255, 255, 255, 0.18);
-        color: #fff;
+        color: #111;
         outline: none;
         transition: border 0.2s;
         box-shadow: none;
@@ -64,7 +64,7 @@
         left: 18px;
         top: 50%;
         transform: translateY(-50%);
-        color: #fff;
+        color: #111;
         font-size: 1.2em;
         opacity: 0.8;
     }
@@ -85,18 +85,20 @@
         width: 100%;
         border-radius: 30px;
         background: #fff;
-        color: #3a2e5c;
+        color: #111;
         font-weight: 600;
         font-size: 1.1em;
-        border: none;
+        border: 2px solid #000;
+        /* black border */
         padding: 13px 0;
         margin: 18px 0 10px 0;
-        transition: background 0.2s;
+        transition: background 0.2s, color 0.2s;
         box-shadow: 0 2px 8px rgba(31, 38, 135, 0.08);
     }
 
     .glass-card .btn-login:hover {
-        background: #f3f3f3;
+        background: #111;
+        color: #fff;
     }
 
     .glass-card .links {
@@ -113,7 +115,7 @@
 </style>
 <div class="login-page">
     <form method="POST" action="{{ route('login') }}" class="glass-card">
-        <h2>Login</h2>
+        <h2 style="color: #111;">Welcome back</h2>
         @csrf
         <div class="input-group">
             <span class="input-icon"><i class="fa fa-envelope"></i></span>
@@ -171,15 +173,16 @@
         <div class="d-flex justify-content-between align-items-center w-100 mb-2">
             <div class="form-check" style="padding-left: 1.5em;">
                 <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-                <label class="form-check-label" for="remember">Remember me</label>
+                <label class="form-check-label" for="remember" style="color:#111;">Remember me</label>
             </div>
             @if (Route::has('password.request'))
-            <a class="forgot-link" href="{{ route('password.request') }}">Forgot Password?</a>
+            <a class="forgot-link" href="{{ route('password.request') }}" style="color:#111;">Forgot Password?</a>
             @endif
         </div>
         <button type="submit" class="btn btn-login">Login</button>
-        <div class="links">
-            Don't have an account? <a href="{{ route('register') }}">Register</a>
+
+        <div class="links" style="color: #111;">
+            Don't have an account? <a href="{{ route('register') }}" style="color: #111; font-weight: bold;">Register</a>
         </div>
     </form>
 </div>

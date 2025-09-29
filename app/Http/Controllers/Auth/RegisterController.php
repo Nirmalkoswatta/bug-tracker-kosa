@@ -43,7 +43,7 @@ class RegisterController extends Controller
             return '/pm-dashboard';
         }
         if ($user->role === 'Admin') {
-            return '/admin-dashboard';
+            return '/bugs';
         }
         return '/home';
     }

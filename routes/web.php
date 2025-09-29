@@ -1,10 +1,14 @@
-
 <?php
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+// use App\Http\Controllers\AdminController; // Removed with admin dashboard deletion
+use App\Http\Controllers\BugController;
+use App\Http\Controllers\AdminUserController;
 use App\Models\Bug;
+
+/* Admin routes removed */
 
 // Secure download route for bug attachments
 Route::get('/bugs/{bug}/download', function (App\Models\Bug $bug) {
@@ -28,14 +32,7 @@ Route::get('/dev/bugs/{bug}/edit', [App\Http\Controllers\BugController::class, '
     ->middleware('auth')
     ->name('dev.bugs.edit');
 
-// Admin: Update developer permissions
-Route::post('/admin/developer/{id}/toggle-qas', function ($id) {
-    if (!Auth::check() || Auth::user()->role !== 'Admin') abort(403);
-    $dev = \App\Models\User::where('role', 'Dev')->findOrFail($id);
-    $dev->can_access_qas = !$dev->can_access_qas;
-    $dev->save();
-    return redirect()->route('admin.dashboard');
-})->middleware('auth')->name('admin.toggleQAs');
+// Admin toggle route removed
 
 // Developer Dashboard
 Route::get('/dev-dashboard', function () {
@@ -44,6 +41,70 @@ Route::get('/dev-dashboard', function () {
     return view('dev-dashboard', compact('bugs'));
 })->middleware('auth')->name('dev.dashboard');
 
+// Legacy single page dashboard now redirects to multipage overview
+Route::get('/admin-dashboard', function () {
+    return redirect()->route('admin.overview');
+})->middleware('auth')->name('admin.dashboard');
+
+// Admin: Assign QA/Dev to bug
+Route::post('/admin/bugs/{bug}/assign', [BugController::class, 'adminAssign'])
+    ->middleware('auth')
+    ->name('admin.bugs.assign');
+
+// Admin multi-page navigation
+Route::get('/admin/overview', function () {
+    if (!Auth::check() || Auth::user()->role !== 'Admin') abort(403);
+    $metrics = [
+        'open' => \App\Models\Bug::where('status', 'open')->count(),
+        'assigned' => \App\Models\Bug::whereNotNull('assigned_to')->count(),
+        'in_qa' => \App\Models\Bug::whereIn('status', ['in_progress', 'review', 'inprogress'])->count(),
+        'resolved' => \App\Models\Bug::whereIn('status', ['done', 'completed'])->count(),
+    ];
+    $developers = \App\Models\User::where('role', 'Dev')->get();
+    $qas = \App\Models\User::where('role', 'QA')->get();
+    $pms = \App\Models\User::where('role', 'PM')->get();
+    return view('admin.overview', compact('metrics', 'developers', 'qas', 'pms'));
+})->middleware('auth')->name('admin.overview');
+
+Route::get('/admin/projects', function () {
+    if (!Auth::check() || Auth::user()->role !== 'Admin') abort(403);
+    $projects = collect();
+    return view('admin.projects', compact('projects'));
+})->middleware('auth')->name('admin.projects');
+
+Route::get('/admin/bugs', function () {
+    if (!Auth::check() || Auth::user()->role !== 'Admin') abort(403);
+    $bugs = \App\Models\Bug::with(['assignedTo', 'creator'])->latest()->get();
+    $developers = \App\Models\User::where('role', 'Dev')->get();
+    $qas = \App\Models\User::where('role', 'QA')->get();
+    $pms = \App\Models\User::where('role', 'PM')->get();
+    // Build lanes server-side to avoid undefined variable issues in Blade
+    $collection = $bugs instanceof \Illuminate\Support\Collection ? $bugs : collect($bugs);
+    $lanes = [
+        'Backlog' => $collection->where('status', 'open'),
+        'Assigned' => $collection->filter(fn($b) => $b->assigned_to && !in_array($b->status, ['in_progress', 'inprogress', 'done', 'completed'])),
+        'In Progress' => $collection->filter(fn($b) => in_array($b->status, ['in_progress', 'inprogress'])),
+        'QA' => $collection->where('status', 'review'),
+        'Resolved' => $collection->filter(fn($b) => in_array($b->status, ['done', 'completed'])),
+        'Closed' => collect(),
+    ];
+    return view('admin.bugs', compact('bugs', 'developers', 'qas', 'pms', 'lanes'));
+})->middleware('auth')->name('admin.bugs');
+
+Route::get('/admin/users', function () {
+    if (!Auth::check() || Auth::user()->role !== 'Admin') abort(403);
+    $developers = \App\Models\User::where('role', 'Dev')->get();
+    $qas = \App\Models\User::where('role', 'QA')->get();
+    $pms = \App\Models\User::where('role', 'PM')->get();
+    return view('admin.users', compact('developers', 'qas', 'pms'));
+})->middleware('auth')->name('admin.users');
+
+Route::get('/admin/settings', function () {
+    if (!Auth::check() || Auth::user()->role !== 'Admin') abort(403);
+    $users = \App\Models\User::orderBy('name')->get();
+    return view('admin.settings', compact('users'));
+})->middleware('auth')->name('admin.settings');
+
 // PM Dashboard
 Route::get('/pm-dashboard', function () {
     if (!Auth::check() || Auth::user()->role !== 'PM') abort(403);
@@ -51,15 +112,7 @@ Route::get('/pm-dashboard', function () {
     return view('pm-dashboard', compact('bugs'));
 })->middleware('auth')->name('pm.dashboard');
 
-// Admin Dashboard
-Route::get('/admin-dashboard', [App\Http\Controllers\AdminController::class, 'dashboard'])
-    ->middleware('auth')
-    ->name('admin.dashboard');
-    
-// Admin CSV Export
-Route::get('/admin/bugs/export-csv', [App\Http\Controllers\AdminController::class, 'exportCsv'])
-    ->middleware('auth')
-    ->name('admin.bugs.export.csv');
+// Removed duplicate admin dashboard & export routes (grouped above)
 
 Route::get('/', function () {
     return redirect('/login');
@@ -68,3 +121,8 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::resource('bugs', App\Http\Controllers\BugController::class);
+
+// Admin user management
+Route::post('/admin/users', [AdminUserController::class, 'store'])->middleware('auth')->name('admin.users.store');
+Route::patch('/admin/users/{id}', [AdminUserController::class, 'update'])->middleware('auth')->name('admin.users.update');
+Route::delete('/admin/users/{id}', [AdminUserController::class, 'destroy'])->middleware('auth')->name('admin.users.destroy');

@@ -12,18 +12,16 @@
     }
 
     .modern-bug-edit-card {
-        background: rgba(255, 255, 255, 0.13);
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
+        background: #fff;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.13);
         border-radius: 24px;
-        border: 1.5px solid rgba(255, 255, 255, 0.18);
+        border: 1.5px solid #e5e7eb;
         max-width: 500px;
         width: 100%;
         padding: 2.5rem 2rem 2rem 2rem;
         margin: 2.5rem 0;
         position: relative;
-        color: #fff;
+        color: #111;
     }
 
     .modern-bug-edit-title {
@@ -39,28 +37,28 @@
     .modern-bug-edit-label {
         font-weight: 500;
         margin-bottom: 0.4rem;
-        color: #e0e0e0;
+        color: #888;
         letter-spacing: 0.5px;
     }
 
     .modern-bug-edit-input,
     .modern-bug-edit-select,
     .modern-bug-edit-textarea {
-        background: #181818;
-        border: 1.5px solid rgba(255, 255, 255, 0.22);
+        background: #fff;
+        border: 1.5px solid #e5e7eb;
         border-radius: 12px;
-        color: #fff;
+        color: #111;
         padding: 0.7rem 1rem;
         margin-bottom: 1.2rem;
         width: 100%;
         font-size: 1.08rem;
         transition: border-color 0.2s, box-shadow 0.2s;
-        box-shadow: 0 1px 6px #0002;
+        box-shadow: 0 1px 6px #0001;
     }
 
     .modern-bug-edit-select option {
-        background: #181818;
-        color: #fff;
+        background: #fff;
+        color: #111;
     }
 
     .modern-bug-edit-input:focus,
@@ -122,7 +120,7 @@
 </style>
 <div class="modern-bug-edit-bg">
     <div class="modern-bug-edit-card">
-        <div class="modern-bug-edit-title">Bug Tracker</div>
+        <div class="modern-bug-edit-title" style="color:#111;">Bug Tracker</div>
         <form method="POST" action="{{ route('bugs.update', $bug) }}">
             @csrf
             @method('PUT')
@@ -133,8 +131,23 @@
             @if(Auth::user()->role === 'Admin')
             <label for="assigned_to" class="modern-bug-edit-label">Assigned Developer</label>
             <select class="modern-bug-edit-select" id="assigned_to" name="assigned_to">
+                <option value="">-- None --</option>
                 @foreach($devs as $dev)
                 <option value="{{ $dev->id }}" @if($bug->assigned_to == $dev->id) selected @endif>{{ $dev->name }} ({{ $dev->email }})</option>
+                @endforeach
+            </select>
+            <label for="reviewed_by" class="modern-bug-edit-label">QA Reviewer</label>
+            <select class="modern-bug-edit-select" id="reviewed_by" name="reviewed_by">
+                <option value="">-- None --</option>
+                @foreach(($qas ?? collect()) as $qa)
+                <option value="{{ $qa->id }}" @if(($bug->reviewed_by ?? null) == $qa->id) selected @endif>{{ $qa->name }} ({{ $qa->email }})</option>
+                @endforeach
+            </select>
+            <label for="pm_id" class="modern-bug-edit-label">Project Manager</label>
+            <select class="modern-bug-edit-select" id="pm_id" name="pm_id">
+                <option value="">-- None --</option>
+                @foreach(($pms ?? collect()) as $pm)
+                <option value="{{ $pm->id }}" @if(($bug->pm_id ?? null) == $pm->id) selected @endif>{{ $pm->name }} ({{ $pm->email }})</option>
                 @endforeach
             </select>
             @endif

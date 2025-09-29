@@ -2,133 +2,158 @@
 
 @section('content')
 <style>
+    /* Layout container */
     .dev-dashboard-bg {
         margin-top: 90px;
-        min-height: 100vh;
-        width: 100vw;
-        background: url('{{ asset(' 10780356_19199649.jpg') }}') no-repeat center center fixed;
-        background-size: cover;
-        color: #fff;
+        min-height: calc(100vh - 90px);
+        width: 100%;
+        background: #f7f7f9;
+        color: #111;
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding-bottom: 3rem;
+        padding: 2rem 1rem 3rem;
     }
 
     .dev-dashboard-title {
-        font-size: 2rem;
-        font-weight: bold;
-        margin: 2rem 0 1.5rem 0;
+        font-size: 2.15rem;
+        font-weight: 800;
+        margin: 0 0 2rem 0;
         text-align: center;
-        letter-spacing: 1px;
-        text-shadow: 0 2px 12px #0008;
+        letter-spacing: .5px;
+        color: #111;
     }
 
+    /* Card grid */
     .dev-bug-cards {
         display: flex;
         flex-wrap: wrap;
-        gap: 2rem;
+        gap: 1.6rem;
         justify-content: center;
         width: 100%;
-        max-width: 1200px;
+        max-width: 1260px;
     }
 
     .dev-bug-card {
-        background: rgba(255, 255, 255, 0.13);
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
-        border-radius: 20px;
-        border: 1.5px solid rgba(255, 255, 255, 0.18);
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 22px;
         min-width: 270px;
         max-width: 340px;
         width: 100%;
-        padding: 1.7rem 1.3rem 1.3rem 1.3rem;
-        color: #fff;
+        padding: 1.4rem 1.15rem 1.25rem;
+        color: #111;
         display: flex;
         flex-direction: column;
-        gap: 0.7rem;
+        gap: .55rem;
         position: relative;
-        transition: transform 0.15s, box-shadow 0.15s;
+        box-shadow: 0 6px 18px -4px rgba(0, 0, 0, .08), 0 2px 4px -2px rgba(0, 0, 0, .05);
+        transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .dev-bug-card:before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: radial-gradient(circle at 18% 20%, rgba(99, 102, 241, .08), transparent 60%), radial-gradient(circle at 80% 75%, rgba(236, 72, 153, .09), transparent 62%);
     }
 
     .dev-bug-card:hover {
-        transform: translateY(-6px) scale(1.03);
-        box-shadow: 0 12px 36px -6px #000a;
+        transform: translateY(-6px);
+        box-shadow: 0 12px 28px -6px rgba(0, 0, 0, .18);
     }
 
     .dev-bug-id {
-        font-size: 1.1rem;
+        font-size: .95rem;
         font-weight: 600;
-        color: #b3e5fc;
+        color: #334155;
+        letter-spacing: .5px;
     }
 
     .dev-bug-title {
-        font-size: 1.25rem;
+        font-size: 1.15rem;
         font-weight: 700;
-        margin-bottom: 0.2rem;
-        color: #fff;
-        text-shadow: 0 1px 6px #0006;
+        margin-bottom: .1rem;
+        color: #111;
     }
 
+    /* Status badge */
     .dev-bug-status {
         display: inline-block;
-        font-size: 0.95rem;
-        font-weight: 600;
-        padding: 0.3em 1em;
-        border-radius: 1em;
-        background: #222;
+        font-size: .65rem;
+        font-weight: 700;
+        padding: .4em .85em;
+        border-radius: 2em;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        background: #111;
         color: #fff;
-        margin-bottom: 0.5rem;
-        letter-spacing: 0.5px;
     }
 
     .dev-bug-status.inprogress {
-        background: #f1c40f;
-        color: #222;
+        background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        color: #111;
     }
 
     .dev-bug-status.review {
-        background: #3498db;
+        background: linear-gradient(90deg, #4f46e5, #6366f1);
         color: #fff;
     }
 
     .dev-bug-status.done {
-        background: #27ae60;
+        background: linear-gradient(90deg, #059669, #34d399);
         color: #fff;
     }
 
+    /* Actions */
     .dev-bug-actions {
-        margin-top: 1rem;
+        margin-top: .75rem;
         display: flex;
         justify-content: flex-end;
-        gap: 0.7rem;
+        gap: .55rem;
     }
 
-    .dev-bug-update-btn {
-        border-radius: 16px;
-        background: #ffb300;
-        color: #222;
+    .dev-bug-btn {
+        font-size: .7rem;
         font-weight: 600;
-        border: none;
-        padding: 0.5rem 1.3rem;
-        box-shadow: 0 2px 8px #ffb30033;
-        transition: background 0.2s;
+        border: 2px solid #111;
+        background: #fff;
+        color: #111;
+        padding: .5rem 1rem;
+        border-radius: 1rem;
+        letter-spacing: .5px;
+        cursor: pointer;
+        transition: .18s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
     }
 
-    .dev-bug-update-btn:hover {
-        background: #ff9800;
+    .dev-bug-btn:hover {
+        background: #111;
         color: #fff;
     }
 
-    @media (max-width: 700px) {
+    .dev-bug-btn.primary {
+        background: #111;
+        color: #fff;
+    }
+
+    .dev-bug-btn.primary:hover {
+        background: #222;
+    }
+
+    /* Responsive */
+    @media (max-width:700px) {
         .dev-bug-cards {
-            gap: 1.2rem;
+            gap: 1.1rem;
         }
 
         .dev-bug-card {
-            min-width: 90vw;
-            max-width: 98vw;
+            min-width: 92vw;
+            max-width: 96vw;
         }
     }
 </style>
@@ -142,25 +167,11 @@
             <div class="dev-bug-status {{ strtolower($bug->status) }}">{{ ucfirst($bug->status) }}</div>
             <div class="dev-bug-actions">
                 @if($bug->attachment)
-                <a href="{{ route('bugs.download', $bug) }}" class="dev-bug-update-btn" style="background:#2196f3; color:#fff;">Download</a>
+                <a href="{{ route('bugs.download', $bug) }}" class="dev-bug-btn" title="Download attachment">📎 Download</a>
                 @endif
-                <a href="{{ route('bugs.edit', $bug) }}" class="dev-bug-update-btn">Update Status</a>
+                <a href="{{ route('bugs.edit', $bug) }}" class="dev-bug-btn primary" title="Update bug status">✏️ Update Status</a>
             </div>
-            <!-- Modal for viewing bug details -->
-            <div class="modal fade" id="viewModal-{{ $bug->id }}" tabindex="-1" aria-labelledby="viewModalLabel-{{ $bug->id }}" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content bg-dark text-white">
-                        <div class="modal-header border-0">
-                            <h5 class="modal-title" id="viewModalLabel-{{ $bug->id }}">Bug Details</h5>
-                            <button type="button" class="btn btn-danger" style="border-radius:50%; width:2rem; height:2rem; display:flex; align-items:center; justify-content:center; font-size:1.3rem; position:absolute; top:1rem; right:1rem; z-index:10;" data-bs-dismiss="modal" aria-label="Close">&times;</button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="mb-2"><strong>Title:</strong> {{ $bug->title }}</div>
-                            <div><strong>Description:</strong><br>{{ $bug->description }}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- (Removed legacy bootstrap modal markup for lighter, clean black-text style) -->
         </div>
         @endforeach
     </div>

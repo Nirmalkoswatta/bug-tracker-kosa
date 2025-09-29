@@ -29,7 +29,8 @@
     }
 
     .glass-card h2 {
-        color: #fff;
+        color: #111;
+        /* make heading black */
         font-size: 2rem;
         font-weight: 700;
         margin-bottom: 32px;
@@ -47,13 +48,15 @@
     .glass-card .input-group select {
         width: 100%;
         border-radius: 30px;
-        border: 1.5px solid #fff;
+        border: 2px solid #000;
+        /* black border */
         padding: 14px 48px 14px 44px;
         font-size: 1.08rem;
-        background: rgba(255, 255, 255, 0.18);
+        background: #fff;
+        /* solid white for clarity */
         color: #111;
         outline: none;
-        transition: border 0.2s;
+        transition: border 0.2s, background 0.2s;
         box-shadow: none;
         appearance: none;
     }
@@ -64,8 +67,8 @@
 
     .glass-card .input-group input:focus,
     .glass-card .input-group select:focus {
-        border: 1.5px solid #a18cd1;
-        background: rgba(255, 255, 255, 0.28);
+        border: 2px solid #000;
+        background: #f8f8f8;
     }
 
     .glass-card .input-group .input-icon {
@@ -73,44 +76,49 @@
         left: 18px;
         top: 50%;
         transform: translateY(-50%);
-        color: #fff;
+        color: #111;
+        /* icon black */
         font-size: 1.2em;
-        opacity: 0.8;
+        opacity: 0.75;
     }
 
     .glass-card .btn-signup {
         width: 100%;
         border-radius: 30px;
-        background: #fff;
-        color: #3a2e5c;
+        background: #111;
+        color: #fff;
         font-weight: 600;
         font-size: 1.1em;
-        border: none;
+        border: 2px solid #000;
+        /* black border */
         padding: 13px 0;
         margin: 18px 0 10px 0;
-        transition: background 0.2s;
+        transition: background 0.2s, color 0.2s;
         box-shadow: 0 2px 8px rgba(31, 38, 135, 0.08);
     }
 
     .glass-card .btn-signup:hover {
-        background: #f3f3f3;
+        background: #000;
+        color: #fff;
     }
 
     .glass-card .links {
         text-align: center;
         margin-top: 10px;
         font-size: 1em;
-        color: #fff;
+        color: #111;
+        /* black */
     }
 
     .glass-card .links a {
-        color: #fff;
+        color: #111;
+        font-weight: 600;
         text-decoration: underline;
     }
 </style>
 <div class="login-page">
     <form method="POST" action="{{ route('register') }}" class="glass-card">
-        <h2>Register</h2>
+        <h2 style="color:#111;">Register</h2>
         @csrf
         <div class="input-group">
             <span class="input-icon"><i class="fa fa-user"></i></span>
@@ -180,8 +188,8 @@
         @endpush
         <button type="submit" class="btn btn-signup">Sign Up</button>
     </form>
-    <div class="links" style="text-align:center; margin-top:18px; font-size:1.05em; color:#fff; width:100%;">
-        Have an Account? <a href="{{ route('login') }}" style="color:#ffd700; text-decoration:underline;">Login Here</a>
+    <div class="links" style="text-align:center; margin-top:18px; font-size:1.05em; color:#111; width:100%;">
+        Have an Account? <a href="{{ route('login') }}" style="color:#111; text-decoration:underline; font-weight:600;">Login Here</a>
     </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />

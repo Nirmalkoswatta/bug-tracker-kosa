@@ -1,8 +1,8 @@
+// Variables (use @use for your own partial)
+@use 'variables' as *;
+
 // Fonts
 @import url('https://fonts.bunny.net/css?family=Nunito');
 
-// Variables
-@import 'variables';
-
-// Bootstrap
+// Bootstrap (must remain @import until Bootstrap supports @use)
 @import 'bootstrap/scss/bootstrap';
