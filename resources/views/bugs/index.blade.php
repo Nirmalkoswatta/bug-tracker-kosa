@@ -45,6 +45,36 @@
         color: #fff;
     }
 
+    .bug-severity {
+        font-size: 0.78rem;
+        padding: 0.25em 0.75em;
+        border-radius: 9999px;
+        font-weight: 600;
+        letter-spacing: .3px;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .bug-severity-low {
+        background: #e8f5e9;
+        /* light green */
+        color: #1b5e20;
+        border-color: #c8e6c9;
+    }
+
+    .bug-severity-medium {
+        background: #fff3e0;
+        /* light orange */
+        color: #e65100;
+        border-color: #ffe0b2;
+    }
+
+    .bug-severity-high {
+        background: #ffebee;
+        /* light red */
+        color: #b71c1c;
+        border-color: #ffcdd2;
+    }
+
     .bug-meta-label {
         color: #bbb;
         font-size: 0.92em;
@@ -54,7 +84,7 @@
         min-width: 70px;
     }
 </style>
-<div class="bug-cards-bg" style="background: url('{{ asset('10780356_19199649.jpg') }}') no-repeat center center fixed; background-size: cover;">
+<div class="bug-cards-bg">
     <div class="container">
         <h2 class="text-white mb-4">All Bugs</h2>
         @if(session('success'))
@@ -79,7 +109,18 @@
                 <div class="bug-card-glass p-4 h-100 d-flex flex-column">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <span class="fw-bold fs-5" style="color:#111;">{{ $bug->title }}</span>
-                        <span class="{{ $statusClass }}">{{ ucfirst($status) }}</span>
+                        <div class="d-flex align-items-center gap-2">
+                            @php
+                            $sev = strtolower($bug->severity ?? 'low');
+                            $sevClass = match($sev) {
+                            'high' => 'bug-severity bug-severity-high',
+                            'medium' => 'bug-severity bug-severity-medium',
+                            default => 'bug-severity bug-severity-low'
+                            };
+                            @endphp
+                            <span class="{{ $sevClass }}" title="Severity">{{ ucfirst($sev) }}</span>
+                            <span class="{{ $statusClass }}">{{ ucfirst($status) }}</span>
+                        </div>
                     </div>
                     <div class="mb-2">
                         <span class="bug-meta-label">ID:</span> <span style="color:#111;">{{ $bug->id }}</span>

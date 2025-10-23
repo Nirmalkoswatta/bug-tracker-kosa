@@ -1,5 +1,5 @@
-@extends('layouts.admin')
-@section('admin-content')
+@extends('layouts.clean')
+@section('content')
 <div class="mb-6">
     <h2 class="text-2xl font-bold text-slate-800">Projects</h2>
     <p class="text-slate-500 text-sm">Your projects at a glance.</p>

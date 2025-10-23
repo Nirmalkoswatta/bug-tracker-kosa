@@ -157,6 +157,15 @@
                 <option value="review" {{ $bug->status == 'review' ? 'selected' : '' }}>Review</option>
                 <option value="done" {{ $bug->status == 'done' ? 'selected' : '' }}>Done</option>
             </select>
+            @if(in_array(Auth::user()->role, ['QA','Admin']))
+            <label for="severity" class="modern-bug-edit-label">Severity</label>
+            <select class="modern-bug-edit-select" id="severity" name="severity">
+                @php $sev = strtolower($bug->severity ?? 'low'); @endphp
+                <option value="low" {{ $sev==='low' ? 'selected' : '' }}>Low</option>
+                <option value="medium" {{ $sev==='medium' ? 'selected' : '' }}>Medium</option>
+                <option value="high" {{ $sev==='high' ? 'selected' : '' }}>High</option>
+            </select>
+            @endif
             <div class="modern-bug-edit-btns">
                 <a href="{{ url()->previous() }}" class="modern-bug-edit-btn-cancel">Cancel</a>
                 <button type="submit" class="modern-bug-edit-btn-update">Update</button>

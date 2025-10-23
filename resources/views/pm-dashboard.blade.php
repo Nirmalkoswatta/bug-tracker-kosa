@@ -33,6 +33,27 @@
             border: 1px solid var(--bdr) !important;
         }
 
+        .sev-badge {
+            font-weight: 700;
+            border-radius: 999px;
+            padding: .2rem .6rem;
+        }
+
+        .sev-low {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .sev-medium {
+            background: #ffedd5;
+            color: #c2410c;
+        }
+
+        .sev-high {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
         h2.pm-title {
             color: #fff;
             font-weight: 600;
@@ -46,6 +67,7 @@
                 <th>ID</th>
                 <th>Title</th>
                 <th>Status</th>
+                <th>Severity</th>
                 <th>Assigned To</th>
                 <th>Created By</th>
             </tr>
@@ -56,6 +78,10 @@
                 <td>{{ $bug->id }}</td>
                 <td>{{ $bug->title }}</td>
                 <td>{{ $bug->status }}</td>
+                <td>
+                    @php $sev = strtolower($bug->severity ?? 'low'); @endphp
+                    <span class="sev-badge {{ 'sev-' . $sev }}">{{ ucfirst($sev) }}</span>
+                </td>
                 <td>{{ optional($bug->assignedTo)->name }}</td>
                 <td>{{ optional($bug->creator)->name }}</td>
             </tr>

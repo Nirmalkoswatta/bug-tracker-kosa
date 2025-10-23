@@ -1,5 +1,5 @@
-@extends('layouts.admin')
-@section('admin-content')
+@extends('layouts.clean')
+@section('content')
 <div class="max-w-full">
     <div class="flex items-center justify-between mb-6">
         <div>
@@ -7,6 +7,48 @@
             <p class="text-slate-500 text-sm">A place where you can manage issues added by yourself…</p>
         </div>
     </div>
+
+    <!-- Filters -->
+    <form method="GET" action="{{ route('admin.bugs') }}" class="mb-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+        <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Search</label>
+            <input type="search" name="q" value="{{ request('q') }}" placeholder="Title contains…" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Status</label>
+            <select name="status" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Any</option>
+                @php $statuses = ['open' => 'Open', 'in_progress' => 'In Progress', 'review' => 'In QA', 'done' => 'Done']; @endphp
+                @foreach($statuses as $val=>$label)
+                <option value="{{ $val }}" @selected(request('status')===$val)>{{ $label }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Severity</label>
+            <select name="severity" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Any</option>
+                @foreach(['low','medium','high'] as $sev)
+                <option value="{{ $sev }}" @selected(request('severity')===$sev)>{{ ucfirst($sev) }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Project</label>
+            <select name="project_id" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">All projects</option>
+                @foreach(($allProjects ?? []) as $p)
+                <option value="{{ $p->id }}" @selected(request('project_id')==$p->id)>{{ $p->name }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="flex items-end gap-2">
+            <button class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+                <i class="fa fa-filter"></i> Apply
+            </button>
+            <a href="{{ route('admin.bugs') }}" class="text-sm text-slate-600 hover:text-slate-800">Reset</a>
+        </div>
+    </form>
 
     <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
         <div class="overflow-x-auto">

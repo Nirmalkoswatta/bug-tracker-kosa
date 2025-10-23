@@ -69,6 +69,14 @@
                 <textarea class="form-control" id="description" name="description" rows="4"></textarea>
             </div>
             <div class="mb-3">
+                <label for="severity" class="form-label">Severity</label>
+                <select class="form-control" id="severity" name="severity">
+                    <option value="low" selected>Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+            </div>
+            <div class="mb-3">
                 <label for="attachment" class="form-label">Attachment (PNG, JPG, PDF only)</label>
                 <input type="file" class="form-control" id="attachment" name="attachment" accept=".png,.jpg,.jpeg,.pdf">
             </div>

@@ -55,6 +55,7 @@ class BugController extends Controller
             'description' => 'nullable|string',
             'attachment' => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048',
             'assigned_to' => 'required|exists:users,id',
+            'severity' => 'nullable|in:low,medium,high',
         ]);
 
         $path = null;
@@ -69,6 +70,7 @@ class BugController extends Controller
             'created_by' => Auth::id(),
             'assigned_to' => $request->assigned_to,
             'status' => 'open',
+            'severity' => $request->input('severity', 'low'),
         ]);
 
         // TODO: Notify assigned Dev (email/notification)
@@ -128,11 +130,15 @@ class BugController extends Controller
                 'title' => 'required|string|max:255',
                 'description' => 'nullable|string',
                 'status' => 'required|in:inprogress,review,done',
+                'severity' => 'nullable|in:low,medium,high',
                 'attachment' => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048',
             ]);
             $bug->title = $validated['title'];
             $bug->description = $validated['description'] ?? '';
             $bug->status = $validated['status'];
+            if (!empty($validated['severity'])) {
+                $bug->severity = $validated['severity'];
+            }
             if ($request->hasFile('attachment')) {
                 $path = $request->file('attachment')->store('attachments', 'public');
                 $bug->attachment = $path;

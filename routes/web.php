@@ -97,12 +97,42 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     Route::resource('projects', ProjectController::class)->except(['index', 'show']);
 });
 
-Route::get('/admin/bugs', function () {
+Route::get('/admin/bugs', function (\Illuminate\Http\Request $request) {
     if (!Auth::check() || Auth::user()->role !== 'Admin') abort(403);
-    $bugs = \App\Models\Bug::with(['assignedTo', 'creator'])->latest()->paginate(10);
+
+    $status = $request->query('status');
+    $severity = $request->query('severity');
+    $projectId = $request->query('project_id');
+    $q = trim((string)$request->query('q'));
+
+    $bugsQuery = \App\Models\Bug::with(['assignedTo', 'creator', 'project'])->latest();
+    if ($status) {
+        // Normalize common variations
+        $normalized = $status;
+        if ($status === 'in_progress') {
+            $bugsQuery->whereIn('status', ['in_progress', 'inprogress']);
+        } elseif ($status === 'done') {
+            $bugsQuery->whereIn('status', ['done', 'completed']);
+        } else {
+            $bugsQuery->where('status', $normalized);
+        }
+    }
+    if ($severity) {
+        $bugsQuery->where('severity', $severity);
+    }
+    if ($projectId) {
+        $bugsQuery->where('project_id', $projectId);
+    }
+    if ($q !== '') {
+        $bugsQuery->where('title', 'like', "%$q%");
+    }
+
+    $bugs = $bugsQuery->paginate(10)->withQueryString();
     $developers = \App\Models\User::where('role', 'Dev')->get();
     $qas = \App\Models\User::where('role', 'QA')->get();
-    return view('admin.bugs', compact('bugs', 'developers', 'qas'));
+    $allProjects = Project::orderBy('name')->get(['id', 'name']);
+
+    return view('admin.bugs', compact('bugs', 'developers', 'qas', 'allProjects', 'status', 'severity', 'projectId', 'q'));
 })->middleware('auth')->name('admin.bugs');
 
 Route::get('/admin/users', function () {
@@ -129,12 +159,75 @@ Route::get('/pm-dashboard', function () {
 // Removed duplicate admin dashboard & export routes (grouped above)
 
 Route::get('/', function () {
-    return redirect('/login');
+    // Always land on the login page when opening the app.
+    // If a session exists, log out first so the login page is actually shown (not redirected to /home).
+    if (Auth::check()) {
+        Auth::logout();
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+    }
+    return redirect()->route('login');
 });
+
+// Fallback for auth scaffolding that may use /home as default after login
+Route::get('/home', function () {
+    if (!Auth::check()) {
+        return redirect()->route('login');
+    }
+    $role = strtolower((string)(Auth::user()->role ?? ''));
+    return match ($role) {
+        'admin' => redirect()->route('admin.dashboard'),
+        'dev'   => redirect()->route('dev.dashboard'),
+        'pm'    => redirect()->route('pm.dashboard'),
+        'qa'    => redirect()->route('bugs.index'),
+        default => redirect()->route('dashboard'),
+    };
+})->name('home');
 
 Auth::routes();
 
 Route::resource('bugs', App\Http\Controllers\BugController::class);
+
+// Clean, card-based unified dashboard (no admin panel), with filters
+Route::get('/dashboard', function (\Illuminate\Http\Request $request) {
+    if (!Auth::check()) {
+        return redirect('/login');
+    }
+
+    // Metrics
+    $metrics = [
+        'open' => Bug::where('status', 'open')->count(),
+        'assigned' => Bug::whereNotNull('assigned_to')->count(),
+        'in_qa' => Bug::whereIn('status', ['in_progress', 'inprogress', 'review'])->count(),
+        'resolved' => Bug::whereIn('status', ['done', 'completed'])->count(),
+    ];
+
+    // Filters
+    $status = $request->query('status');
+    $severity = $request->query('severity');
+    $projectId = $request->query('project_id');
+    $q = trim((string)$request->query('q'));
+
+    $bugsQuery = Bug::with(['assignedTo', 'project'])->latest();
+    if ($status) {
+        $bugsQuery->where('status', $status);
+    }
+    if ($severity) {
+        $bugsQuery->where('severity', $severity);
+    }
+    if ($projectId) {
+        $bugsQuery->where('project_id', $projectId);
+    }
+    if ($q !== '') {
+        $bugsQuery->where('title', 'like', "%$q%");
+    }
+
+    $bugs = $bugsQuery->paginate(10)->withQueryString();
+    $projects = Project::latest()->take(12)->get();
+    $allProjects = Project::orderBy('name')->get(['id', 'name']);
+
+    return view('dashboard', compact('metrics', 'bugs', 'projects', 'allProjects', 'status', 'severity', 'projectId', 'q'));
+})->name('dashboard')->middleware('auth');
 
 // Admin user management
 Route::post('/admin/users', [AdminUserController::class, 'store'])->middleware('auth')->name('admin.users.store');

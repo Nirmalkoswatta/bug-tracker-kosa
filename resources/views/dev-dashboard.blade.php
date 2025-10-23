@@ -131,6 +131,39 @@
         gap: .35rem;
     }
 
+    /* Severity badge (dev dashboard) */
+    .sev-line {
+        margin-top: .25rem;
+    }
+
+    .sev-tag {
+        font-size: .7rem;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: .25rem .6rem;
+    }
+
+    .sev-badge {
+        padding: .2rem .5rem;
+        border-radius: 999px;
+        font-weight: 700;
+    }
+
+    .sev-low {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .sev-medium {
+        background: #ffedd5;
+        color: #c2410c;
+    }
+
+    .sev-high {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
     .dev-bug-btn:hover {
         background: #111;
         color: #fff;
@@ -165,6 +198,17 @@
             <div class="dev-bug-id">#{{ $bug->id }}</div>
             <div class="dev-bug-title">{{ $bug->title }}</div>
             <div class="dev-bug-status {{ strtolower($bug->status) }}">{{ ucfirst($bug->status) }}</div>
+            @php
+            $sev = strtolower($bug->severity ?? 'low');
+            $sevStyle = $sev==='high'
+            ? 'background:#fee2e2;color:#b91c1c'
+            : ($sev==='medium' ? 'background:#ffedd5;color:#c2410c' : 'background:#dcfce7;color:#166534');
+            @endphp
+            <div class="sev-line">
+                <span class="sev-tag">Severity:
+                    <span class="sev-badge {{ 'sev-' . $sev }}">{{ ucfirst($sev) }}</span>
+                </span>
+            </div>
             <div class="dev-bug-actions">
                 @if($bug->attachment)
                 <a href="{{ route('bugs.download', $bug) }}" class="dev-bug-btn" title="Download attachment">📎 Download</a>
