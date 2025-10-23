@@ -45,22 +45,4 @@ class AdminUserController extends Controller
         $user->delete();
         return back()->with('success', 'User deleted.');
     }
-
-    public function update(Request $request, int $id)
-    {
-        $this->assertAdmin();
-        $user = User::findOrFail($id);
-        $data = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|email|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:6',
-            'role' => 'sometimes|required|in:QA,Dev,PM,Admin',
-        ]);
-        if (isset($data['name'])) $user->name = $data['name'];
-        if (isset($data['email'])) $user->email = $data['email'];
-        if (!empty($data['password'])) $user->password = bcrypt($data['password']);
-        if (isset($data['role'])) $user->role = $data['role'];
-        $user->save();
-        return back()->with('success', 'User updated.');
-    }
 }

@@ -1,6 +1,5 @@
-@extends('layouts.admin')
-@php($section='overview')
-@section('admin-content')
+@extends('layouts.app')
+@section('content')
 <div class="card-grid">
     <div class="ui-card">
         <div class="fw-bold">Open Bugs</div>

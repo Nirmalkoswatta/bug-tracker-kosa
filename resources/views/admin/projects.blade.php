@@ -1,6 +1,5 @@
-@extends('layouts.admin')
-@php($section='projects')
-@section('admin-content')
+@extends('layouts.app')
+@section('content')
 <h4 class="mb-3">Projects</h4>
 <div class="card-grid">
     @forelse($projects as $p)

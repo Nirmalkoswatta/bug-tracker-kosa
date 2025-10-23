@@ -3,10 +3,6 @@
 
 <head>
     <style>
-        :root {
-            --nav-h: 88px;
-        }
-
         /* Dropdown styles */
         .dropdown-item.logout-red {
             color: #dc3545 !important;
@@ -53,11 +49,6 @@
             padding: 24px 16px 40px;
         }
 
-        /* Ensure main content always clears fixed navbar even before JS executes */
-        main[data-fixed-nav] {
-            padding-top: calc(var(--nav-h, 88px) + 16px);
-        }
-
         .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -85,14 +76,6 @@
         .ui-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 16px 34px -14px rgba(0, 0, 0, .22);
-        }
-
-        /* Ensure first heading below navbar is never hidden */
-        .page-head,
-        .ui-container>h1:first-child,
-        .ui-container>h2:first-child,
-        .ui-container>h3:first-child {
-            margin-top: max(0px, calc(var(--nav-h, 88px) - 60px));
         }
 
         .btn {
@@ -223,9 +206,8 @@
                 </div>
             </div>
         </nav>
-        <main class="py-4" data-fixed-nav>
+        <main class="py-4" style="padding-top: 88px;">
             <div class="ui-container">
-                @include('partials.flash')
                 @yield('content')
             </div>
         </main>
@@ -233,11 +215,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const nav = document.querySelector('nav.navbar');
-            if (nav) {
-                const h = Math.ceil(nav.getBoundingClientRect().height);
-                document.documentElement.style.setProperty('--nav-h', h + 'px');
-            }
             const cards = Array.from(document.querySelectorAll('.ui-card'));
             cards.forEach((c, i) => {
                 setTimeout(() => c.classList.add('animate-in'), 60 + i * 70);

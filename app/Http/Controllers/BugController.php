@@ -38,9 +38,7 @@ class BugController extends Controller
             abort(403);
         }
         $devs = User::where('role', 'Dev')->get();
-        $qas = User::where('role', 'QA')->get();
-        $pms = User::where('role', 'PM')->get();
-        return view('bugs.create', compact('devs', 'qas', 'pms'));
+        return view('bugs.create', compact('devs'));
     }
 
     /**
@@ -52,17 +50,12 @@ class BugController extends Controller
         if (!in_array(Auth::user()->role, ['QA', 'Admin'])) {
             abort(403);
         }
-        $isAdmin = Auth::user()->role === 'Admin';
-        $rules = [
+        $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'attachment' => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048',
-            // Developer is required for QA submit; for Admin we allow optional then can assign later
-            'assigned_to' => ($isAdmin ? 'nullable' : 'required') . '|exists:users,id',
-            'qa_reviewer' => 'nullable|exists:users,id',
-            'pm_id' => 'nullable|exists:users,id',
-        ];
-        $validated = $request->validate($rules);
+            'assigned_to' => 'required|exists:users,id',
+        ]);
 
         $path = null;
         if ($request->hasFile('attachment')) {
@@ -70,22 +63,17 @@ class BugController extends Controller
         }
 
         $bug = Bug::create([
-            'title' => $validated['title'],
-            'description' => $validated['description'] ?? null,
+            'title' => $request->title,
+            'description' => $request->description,
             'attachment' => $path,
             'created_by' => Auth::id(),
-            'assigned_to' => $validated['assigned_to'] ?? null,
+            'assigned_to' => $request->assigned_to,
             'status' => 'open',
-            'reviewed_by' => $validated['qa_reviewer'] ?? null,
-            'pm_id' => $validated['pm_id'] ?? null,
         ]);
 
         // TODO: Notify assigned Dev (email/notification)
 
-        // If created by Admin redirect them to admin bugs page; else to QA bugs index
-        if ($isAdmin) {
-            return redirect()->route('admin.bugs')->with('success', 'Bug created.');
-        }
+        // Redirect to bugs index (admin dashboard removed)
         return redirect()->route('bugs.index')->with('success', 'Bug created and assigned to developer.');
     }
 
@@ -115,9 +103,7 @@ class BugController extends Controller
             abort(403);
         }
         $devs = User::where('role', 'Dev')->get();
-        $qas = User::where('role', 'QA')->get();
-        $pms = User::where('role', 'PM')->get();
-        return view('bugs.edit', compact('bug', 'devs', 'qas', 'pms'));
+        return view('bugs.edit', compact('bug', 'devs'));
     }
 
     /**
@@ -154,23 +140,13 @@ class BugController extends Controller
             $bug->save();
             return redirect()->route('bugs.index')->with('success', 'Bug updated.');
         } elseif ($user->role === 'Admin') {
-            // Admin can update all primary fields & assignments
-            $validated = $request->validate([
-                'title' => 'sometimes|required|string|max:255',
-                'description' => 'nullable|string',
-                'status' => 'required|in:inprogress,review,done',
-                'assigned_to' => 'nullable|exists:users,id',
-                'reviewed_by' => 'nullable|exists:users,id',
-                'pm_id' => 'nullable|exists:users,id',
+            // Admin can change assigned developer
+            $request->validate([
+                'assigned_to' => 'required|exists:users,id',
             ]);
-            if (array_key_exists('title', $validated)) $bug->title = $validated['title'];
-            if (array_key_exists('description', $validated)) $bug->description = $validated['description'];
-            $bug->status = $validated['status'];
-            $bug->assigned_to = $validated['assigned_to'] ?? null;
-            $bug->reviewed_by = $validated['reviewed_by'] ?? null;
-            $bug->pm_id = $validated['pm_id'] ?? null;
+            $bug->assigned_to = $request->assigned_to;
             $bug->save();
-            return redirect()->route('admin.bugs')->with('success', 'Bug updated.');
+            return redirect()->route('bugs.index')->with('success', 'Assigned developer updated.');
         } else {
             abort(403);
         }
@@ -203,7 +179,6 @@ class BugController extends Controller
         $validated = $request->validate([
             'developer_id' => 'nullable|exists:users,id',
             'qa_id' => 'nullable|exists:users,id',
-            'pm_id' => 'nullable|exists:users,id',
         ]);
 
         // Update developer assignment
@@ -223,14 +198,8 @@ class BugController extends Controller
             $bug->reviewed_by = $validated['qa_id'] ?: null;
         }
 
-        // Update PM assignment
-        if ($request->has('pm_id')) {
-            $bug->pm_id = $validated['pm_id'] ?: null;
-        }
-
         $bug->save();
 
-        // Redirect to new multi-page Bugs admin view
-        return redirect()->route('admin.bugs')->with('success', 'Assignment updated.');
+        return redirect()->route('admin.dashboard')->with('success', 'Assignment updated.');
     }
 }

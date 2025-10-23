@@ -41,9 +41,22 @@ Route::get('/dev-dashboard', function () {
     return view('dev-dashboard', compact('bugs'));
 })->middleware('auth')->name('dev.dashboard');
 
-// Legacy single page dashboard now redirects to multipage overview
+// Admin Dashboard (new) — view only; actions occur in resource controllers
 Route::get('/admin-dashboard', function () {
-    return redirect()->route('admin.overview');
+    if (!Auth::check() || Auth::user()->role !== 'Admin') abort(403);
+    // Minimal data sample; wire real data as needed
+    $metrics = [
+        'open' => \App\Models\Bug::where('status', 'open')->count(),
+        'assigned' => \App\Models\Bug::whereNotNull('assigned_to')->count(),
+        'in_qa' => \App\Models\Bug::whereIn('status', ['in_progress', 'review', 'inprogress'])->count(),
+        'resolved' => \App\Models\Bug::whereIn('status', ['done', 'completed'])->count(),
+    ];
+    $projects = collect();
+    $bugs = \App\Models\Bug::with(['assignedTo', 'creator'])->latest()->limit(25)->get();
+    $developers = \App\Models\User::where('role', 'Dev')->get();
+    $qas = \App\Models\User::where('role', 'QA')->get();
+    $pms = \App\Models\User::where('role', 'PM')->get();
+    return view('admin.dashboard', compact('metrics', 'projects', 'bugs', 'developers', 'qas', 'pms'));
 })->middleware('auth')->name('admin.dashboard');
 
 // Admin: Assign QA/Dev to bug
@@ -77,18 +90,7 @@ Route::get('/admin/bugs', function () {
     $bugs = \App\Models\Bug::with(['assignedTo', 'creator'])->latest()->get();
     $developers = \App\Models\User::where('role', 'Dev')->get();
     $qas = \App\Models\User::where('role', 'QA')->get();
-    $pms = \App\Models\User::where('role', 'PM')->get();
-    // Build lanes server-side to avoid undefined variable issues in Blade
-    $collection = $bugs instanceof \Illuminate\Support\Collection ? $bugs : collect($bugs);
-    $lanes = [
-        'Backlog' => $collection->where('status', 'open'),
-        'Assigned' => $collection->filter(fn($b) => $b->assigned_to && !in_array($b->status, ['in_progress', 'inprogress', 'done', 'completed'])),
-        'In Progress' => $collection->filter(fn($b) => in_array($b->status, ['in_progress', 'inprogress'])),
-        'QA' => $collection->where('status', 'review'),
-        'Resolved' => $collection->filter(fn($b) => in_array($b->status, ['done', 'completed'])),
-        'Closed' => collect(),
-    ];
-    return view('admin.bugs', compact('bugs', 'developers', 'qas', 'pms', 'lanes'));
+    return view('admin.bugs', compact('bugs', 'developers', 'qas'));
 })->middleware('auth')->name('admin.bugs');
 
 Route::get('/admin/users', function () {
@@ -124,5 +126,4 @@ Route::resource('bugs', App\Http\Controllers\BugController::class);
 
 // Admin user management
 Route::post('/admin/users', [AdminUserController::class, 'store'])->middleware('auth')->name('admin.users.store');
-Route::patch('/admin/users/{id}', [AdminUserController::class, 'update'])->middleware('auth')->name('admin.users.update');
 Route::delete('/admin/users/{id}', [AdminUserController::class, 'destroy'])->middleware('auth')->name('admin.users.destroy');
