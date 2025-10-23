@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\BugController;
 use App\Http\Controllers\AdminUserController;
 use App\Models\Bug;
+use App\Models\Project;
+use App\Http\Controllers\ProjectController;
 
 /* Admin routes removed */
 
@@ -81,9 +83,19 @@ Route::get('/admin/overview', function () {
 
 Route::get('/admin/projects', function () {
     if (!Auth::check() || Auth::user()->role !== 'Admin') abort(403);
-    $projects = collect();
+    $projects = Project::withCount([
+        'bugs',
+        'bugs as open_bugs_count' => function ($q) {
+            $q->where('status', 'open');
+        },
+    ])->latest()->paginate(12);
     return view('admin.projects', compact('projects'));
 })->middleware('auth')->name('admin.projects');
+
+// Admin Projects CRUD (except index/show to avoid route conflicts)
+Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
+    Route::resource('projects', ProjectController::class)->except(['index', 'show']);
+});
 
 Route::get('/admin/bugs', function () {
     if (!Auth::check() || Auth::user()->role !== 'Admin') abort(403);

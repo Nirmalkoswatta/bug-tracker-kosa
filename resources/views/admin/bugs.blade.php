@@ -43,7 +43,7 @@
                         <td class="px-4 py-3">
                             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold {{ $sevClass }}">{{ ucfirst($severity) }}</span>
                         </td>
-                        <td class="px-4 py-3 text-slate-600">-</td>
+                        <td class="px-4 py-3 text-slate-600">{{ optional($b->project)->name ?? '-' }}</td>
                         <td class="px-4 py-3 text-slate-600">{{ optional($b->assignedTo)->name ?? 'Not assigned' }}</td>
                         <td class="px-4 py-3 text-slate-600">{{ optional($b->created_at)->format('d F Y') }}</td>
                         <td class="px-4 py-3 text-right whitespace-nowrap">
