@@ -1,5 +1,5 @@
-@extends('layouts.app')
-@section('content')
+@extends('layouts.admin')
+@section('admin-content')
 <div class="card-grid">
     <div class="ui-card">
         <div class="fw-bold">Open Bugs</div>

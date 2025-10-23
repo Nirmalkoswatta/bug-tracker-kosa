@@ -1,5 +1,5 @@
-@extends('layouts.app')
-@section('content')
+@extends('layouts.admin')
+@section('admin-content')
 <h4 class="mb-3">Settings</h4>
 <div class="ui-card">
     <div class="fw-bold mb-2">All Users</div>

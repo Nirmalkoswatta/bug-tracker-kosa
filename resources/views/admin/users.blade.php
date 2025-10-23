@@ -1,5 +1,5 @@
-@extends('layouts.app')
-@section('content')
+@extends('layouts.admin')
+@section('admin-content')
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h4 class="mb-0">Users</h4>
     <form method="POST" action="{{ route('admin.users.store') }}" class="d-flex gap-2">

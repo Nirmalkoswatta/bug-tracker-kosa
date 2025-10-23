@@ -31,8 +31,11 @@
 
         /* Navbar in white theme */
         .navbar {
-            background: #ffffff !important;
+            background: rgba(255, 255, 255, 0.7) !important;
             border-bottom: 1px solid #e5e7eb;
+            box-shadow: 0 4px 24px -8px rgba(0, 0, 0, 0.07);
+            backdrop-filter: blur(8px);
+            transition: background 0.3s, box-shadow 0.3s;
         }
 
         .navbar,
@@ -58,14 +61,58 @@
         }
 
         .ui-card {
-            background: #ffffff;
+            background: rgba(255, 255, 255, 0.95);
             border: 1px solid #e5e7eb;
-            border-radius: 14px;
-            box-shadow: 0 10px 24px -10px rgba(0, 0, 0, .18);
+            border-radius: 18px;
+            box-shadow: 0 10px 32px -10px rgba(80, 80, 180, .13), 0 1.5px 8px -2px rgba(0, 0, 0, .07);
             transition: transform .22s ease, box-shadow .22s ease, opacity .35s ease, translate .35s ease;
-            padding: 14px;
+            padding: 22px 18px;
             opacity: 0;
             transform: translateY(10px);
+        }
+
+        /* Modern form styling */
+        .ui-card form,
+        .ui-card .form {
+            background: rgba(245, 247, 255, 0.7);
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            box-shadow: 0 2px 8px -4px rgba(80, 80, 180, 0.07);
+            margin-bottom: 1rem;
+        }
+
+        .ui-card input,
+        .ui-card select,
+        .ui-card textarea {
+            border-radius: 8px !important;
+            border: 1px solid #d1d5db !important;
+            background: #f8fafc !important;
+            transition: border 0.2s;
+        }
+
+        .ui-card input:focus,
+        .ui-card select:focus,
+        .ui-card textarea:focus {
+            border-color: #6366f1 !important;
+            box-shadow: 0 0 0 2px #6366f133;
+        }
+
+        .ui-card .btn,
+        .ui-card button {
+            border-radius: 8px !important;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+            box-shadow: 0 2px 8px -4px rgba(80, 80, 180, 0.07);
+        }
+
+        .ui-card .btn-outline-primary {
+            border-color: #6366f1 !important;
+            color: #6366f1 !important;
+        }
+
+        .ui-card .btn-outline-primary:hover {
+            background: #6366f1 !important;
+            color: #fff !important;
         }
 
         .ui-card.animate-in {

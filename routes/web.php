@@ -87,7 +87,7 @@ Route::get('/admin/projects', function () {
 
 Route::get('/admin/bugs', function () {
     if (!Auth::check() || Auth::user()->role !== 'Admin') abort(403);
-    $bugs = \App\Models\Bug::with(['assignedTo', 'creator'])->latest()->get();
+    $bugs = \App\Models\Bug::with(['assignedTo', 'creator'])->latest()->paginate(10);
     $developers = \App\Models\User::where('role', 'Dev')->get();
     $qas = \App\Models\User::where('role', 'QA')->get();
     return view('admin.bugs', compact('bugs', 'developers', 'qas'));
